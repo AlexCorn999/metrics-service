@@ -1,5 +1,6 @@
 package data
 
+// Countries список стран для проверки данных.
 var Countries = map[string]string{
 	"AF": "Afghanistan",
 	"AL": "Albania",

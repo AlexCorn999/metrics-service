@@ -14,7 +14,7 @@ type SMSData struct {
 	Provider     string
 }
 
-// CheckSMSSystem проверяет файл sms
+// CheckSMSSystem проверяет файл sms.
 func CheckSMSSystem(path string) ([]SMSData, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -30,7 +30,6 @@ func CheckSMSSystem(path string) ([]SMSData, error) {
 	}
 
 	var smsData []SMSData
-
 	for _, entry := range result {
 
 		values := strings.Split(entry, ";")
@@ -44,7 +43,6 @@ func CheckSMSSystem(path string) ([]SMSData, error) {
 			ResponseTime: values[2],
 			Provider:     values[3],
 		}
-
 		smsData = append(smsData, sms)
 	}
 
@@ -77,7 +75,7 @@ func CheckCountries(sms []SMSData) ([]SMSData, error) {
 func CheckProviders(sms []SMSData) ([]SMSData, error) {
 	var filteredSms []SMSData
 	for _, value := range sms {
-		if _, ok := data.Providers[value.Provider]; ok {
+		if _, ok := data.ProvidersSMSMMS[value.Provider]; ok {
 			filteredSms = append(filteredSms, value)
 		}
 	}
