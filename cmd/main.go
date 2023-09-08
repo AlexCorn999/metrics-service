@@ -1,16 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
-	"github.com/AlexCorn999/metrics-service/internal/support"
+	"github.com/AlexCorn999/metrics-service/internal/apiserver"
 )
 
 func main() {
-	//server := apiserver.NewAPIServer()
-	//if err := server.Start(); err != nil {
-	//	log.Fatal(err)
-	//}
+	server := apiserver.NewAPIServer()
+	if err := server.Start(); err != nil {
+		log.Fatal(err)
+	}
 
 	// result, _ := sms.CheckSMSSystem("./sms.data")
 	// for _, value := range result {
@@ -36,6 +36,9 @@ func main() {
 	// result, _ := billing.CheckBilling("./billing.data")
 	// fmt.Println(result)
 
-	result, _ := support.CheckSupportData()
-	fmt.Printf("%+v", result)
+	// result, _ := support.CheckSupportData()
+	// fmt.Printf("%+v", result)
+
+	// result, _ := accendent.CheckAccendentData()
+	// fmt.Println(result)
 }
