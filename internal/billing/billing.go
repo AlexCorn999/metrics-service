@@ -2,31 +2,29 @@ package billing
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
 
 type BillingData struct {
-	CreateCustomer bool
-	Purchase       bool
-	Payout         bool
-	Recurring      bool
-	FraudControl   bool
-	CheckoutPage   bool
+	CreateCustomer bool `json:"create_customer"`
+	Purchase       bool `json:"purchase"`
+	Payout         bool `json:"payout"`
+	Recurring      bool `json:"reccuring"`
+	FraudControl   bool `json:"fraud_control"`
+	CheckoutPage   bool `json:"checkout_page"`
 }
 
-// CheckBilling проверяет файл billing.data.
 func CheckBilling(path string) (*BillingData, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	// убираем пробелы.
 	str := strings.ReplaceAll(string(data), " ", "")
 
-	// Интерпретируем битовую маску и сохраняем сумму степеней каждого бита.
+	// Интерпретируем битовую маску и сохраняем сумму степеней каждого бита
 	sum := uint8(0)
 	for i := len(str) - 1; i >= 0; i-- {
 		bit, err := strconv.Atoi(string(str[i]))
@@ -39,7 +37,7 @@ func CheckBilling(path string) (*BillingData, error) {
 		}
 	}
 
-	// Проверяем каждый бит на соответствие 1 и сохраняем результаты в структуру.
+	// Проверяем каждый бит на соответствие 1 и сохраняем результаты в структуру
 	billingData := BillingData{
 		CreateCustomer: sum&1 > 0,
 		Purchase:       sum&2 > 0,

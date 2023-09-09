@@ -3,7 +3,7 @@ package support
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -12,7 +12,6 @@ type SupportData struct {
 	ActiveTickets int    `json:"active_tickets"`
 }
 
-// CheckSupportData получает данные о состоянии системы через GET запрос.
 func CheckSupportData() ([]SupportData, error) {
 	resp, err := http.Get("http://127.0.0.1:8383/support")
 	if err != nil {
@@ -23,7 +22,7 @@ func CheckSupportData() ([]SupportData, error) {
 		return nil, errors.New("bad request")
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

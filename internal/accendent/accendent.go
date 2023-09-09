@@ -3,16 +3,16 @@ package accendent
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"sort"
 )
 
 type IncidentData struct {
 	Topic  string `json:"topic"`
-	Status string `json:"status"` // возможные статусы active и closed
+	Status string `json:"status"` // возможные статусы: active и closed
 }
 
-// CheckAccendentData получает данные о состоянии системы через GET запрос.
 func CheckAccendentData() ([]IncidentData, error) {
 	resp, err := http.Get("http://127.0.0.1:8383/accendent")
 	if err != nil {
@@ -23,7 +23,7 @@ func CheckAccendentData() ([]IncidentData, error) {
 		return nil, errors.New("bad request")
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -34,4 +34,10 @@ func CheckAccendentData() ([]IncidentData, error) {
 	}
 
 	return accendents, nil
+}
+
+func ResultAccendentSystem(incident *[]IncidentData) {
+	sort.Slice(*incident, func(i, j int) bool {
+		return (*incident)[i].Status == "active" && (*incident)[j].Status != "active"
+	})
 }

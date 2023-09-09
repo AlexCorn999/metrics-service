@@ -1,7 +1,8 @@
 package email
 
 import (
-	"io/ioutil"
+	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -9,22 +10,19 @@ import (
 )
 
 type EmailData struct {
-	Country      string
-	Provider     string
-	DeliveryTime int
+	Country      string `json:"country"`
+	Provider     string `json:"provider"`
+	DeliveryTime int    `json:"delivery_time"`
 }
 
-// CheckEmails проверяет файл email.data.
 func CheckEmails(path string) ([]EmailData, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	// получаем массив строк, которые необходимо разделить ;
 	result := strings.Split(string(data), "\n")
 
-	// убираем пробелы.
 	for i := 0; i < len(result); i++ {
 		str := strings.ReplaceAll(result[i], " ", "")
 		result[i] = str
@@ -33,9 +31,8 @@ func CheckEmails(path string) ([]EmailData, error) {
 
 	var emailData []EmailData
 	for _, entry := range result {
-		// делим строку на данные.
 		values := strings.Split(entry, ";")
-		// должно быть 3 типа данных. Если нету, то пропускаем.
+
 		if len(values) != 3 {
 			continue
 		}
@@ -67,7 +64,6 @@ func CheckEmails(path string) ([]EmailData, error) {
 
 }
 
-// CheckCountries проверяет на корректность страны.
 func CheckCountries(emails []EmailData) ([]EmailData, error) {
 	var filteredEmails []EmailData
 	for _, value := range emails {
@@ -78,7 +74,6 @@ func CheckCountries(emails []EmailData) ([]EmailData, error) {
 	return filteredEmails, nil
 }
 
-// CheckProviders проверяет на корректность провайдера.
 func CheckProviders(emails []EmailData) ([]EmailData, error) {
 	var filteredEmails []EmailData
 	for _, value := range emails {
@@ -87,4 +82,56 @@ func CheckProviders(emails []EmailData) ([]EmailData, error) {
 		}
 	}
 	return filteredEmails, nil
+}
+
+/*
+func ResultEmailSystem(emails *[]EmailData) *map[string][][]EmailData {
+	resultData := make(map[string][][]EmailData)
+	sortByCountry(emails)
+
+	countries := make(map[string][]EmailData)
+	for _, email := range *emails {
+		countries[email.Country] = append(countries[email.Country], email)
+	}
+
+	for country, value := range countries {
+		fastestProviders := make([]EmailData, 3)
+		slowestProviders := make([]EmailData, 3)
+
+		for _, email := range value {
+			// Sort providers by delivery time in ascending order
+			sort.SliceStable(value, func(i, j int) bool {
+				return email.DeliveryTime < email.DeliveryTime
+			})
+
+			// Add fastest providers
+			if len(email) >= 3 {
+				fastestProviders = append(fastestProviders, email.Provider...)
+				fastestProviders = fastestProviders[:3]
+			} else {
+				fastestProviders = append(fastestProviders, email.Provider...)
+			}
+
+			// Add slowest providers
+			if len(email.Provider) >= 3 {
+				slowestProviders = append(slowestProviders, email.Provider...)
+				slowestProviders = slowestProviders[:3]
+			} else {
+				slowestProviders = append(slowestProviders, email.Provider...)
+			}
+		}
+
+	}
+
+	fmt.Println("_____________")
+	fmt.Println(countries)
+	fmt.Println("_____________")
+
+	return &resultData
+}*/
+
+func sortByCountry(email *[]EmailData) {
+	sort.SliceStable(*email, func(i, j int) bool {
+		return (*email)[i].Country < (*email)[j].Country
+	})
 }

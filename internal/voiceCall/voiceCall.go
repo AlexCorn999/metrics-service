@@ -1,7 +1,7 @@
 package voicecall
 
 import (
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 
@@ -9,27 +9,24 @@ import (
 )
 
 type VoiceCallData struct {
-	Country             string
-	Bandwidth           string
-	ResponseTime        string
-	Provider            string
-	ConnectionStability float32
-	TTFB                int
-	VoicePurity         int
-	MedianOfCallsTime   int
+	Country             string  `json:"country"`
+	Bandwidth           string  `json:"bandwidth"`
+	ResponseTime        string  `json:"response_time"`
+	Provider            string  `json:"provider"`
+	ConnectionStability float32 `json:"connection_stability"`
+	TTFB                int     `json:"ttfb"`
+	VoicePurity         int     `json:"voice_purity"`
+	MedianOfCallsTime   int     `json:"median_of_calls_time"`
 }
 
-// CheckVoiceCall проверяет файл voice.data.
 func CheckVoiceCall(path string) ([]VoiceCallData, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	// получаем массив строк, которые необходимо разделить ;
 	result := strings.Split(string(data), "\n")
 
-	// убираем пробелы.
 	for i := 0; i < len(result); i++ {
 		str := strings.ReplaceAll(result[i], " ", "")
 		result[i] = str
@@ -38,9 +35,8 @@ func CheckVoiceCall(path string) ([]VoiceCallData, error) {
 
 	var voiceData []VoiceCallData
 	for _, entry := range result {
-		// делим строку на данные.
 		values := strings.Split(entry, ";")
-		// должно быть 8 типов данных. Если нету, то пропускаем.
+
 		if len(values) != 8 {
 			continue
 		}
@@ -92,7 +88,6 @@ func CheckVoiceCall(path string) ([]VoiceCallData, error) {
 
 }
 
-// CheckCountries проверяет на корректность страны.
 func CheckCountries(voice []VoiceCallData) ([]VoiceCallData, error) {
 	var filteredVoiceCall []VoiceCallData
 	for _, value := range voice {
@@ -103,7 +98,6 @@ func CheckCountries(voice []VoiceCallData) ([]VoiceCallData, error) {
 	return filteredVoiceCall, nil
 }
 
-// CheckProviders проверяет на корректность провайдера.
 func CheckProviders(voice []VoiceCallData) ([]VoiceCallData, error) {
 	var filteredVoiceCall []VoiceCallData
 	for _, value := range voice {

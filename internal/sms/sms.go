@@ -1,22 +1,22 @@
 package sms
 
 import (
-	"io/ioutil"
+	"os"
+	"sort"
 	"strings"
 
 	"github.com/AlexCorn999/metrics-service/internal/data"
 )
 
 type SMSData struct {
-	Country      string
-	Bandwidth    string
-	ResponseTime string
-	Provider     string
+	Country      string `json:"country"`
+	Bandwidth    string `json:"bandwidth"`
+	ResponseTime string `json:"response_time"`
+	Provider     string `json:"provider"`
 }
 
-// CheckSMSSystem проверяет файл sms.
 func CheckSMSSystem(path string) ([]SMSData, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,6 @@ func CheckSMSSystem(path string) ([]SMSData, error) {
 
 }
 
-// CheckCountries проверяет на корректность страны.
 func CheckCountries(sms []SMSData) ([]SMSData, error) {
 	var filteredSms []SMSData
 	for _, value := range sms {
@@ -71,7 +70,6 @@ func CheckCountries(sms []SMSData) ([]SMSData, error) {
 	return filteredSms, nil
 }
 
-// CheckProviders проверяет на корректность провайдера.
 func CheckProviders(sms []SMSData) ([]SMSData, error) {
 	var filteredSms []SMSData
 	for _, value := range sms {
@@ -80,4 +78,34 @@ func CheckProviders(sms []SMSData) ([]SMSData, error) {
 		}
 	}
 	return filteredSms, nil
+}
+
+func ResultSMSSystem(sms *[]SMSData) *[][]SMSData {
+	var resultData [][]SMSData
+
+	for i := 0; i < len(*sms); i++ {
+		country := data.Countries[(*sms)[i].Country]
+		(*sms)[i].Country = country
+	}
+
+	sms2 := make([]SMSData, len(*sms))
+	copy(sms2, *sms)
+
+	sortByProvider(sms)
+	sortByCountry(&sms2)
+
+	resultData = [][]SMSData{*sms, sms2}
+	return &resultData
+}
+
+func sortByProvider(sms *[]SMSData) {
+	sort.Slice(*sms, func(i, j int) bool {
+		return (*sms)[i].Provider < (*sms)[j].Provider
+	})
+}
+
+func sortByCountry(sms *[]SMSData) {
+	sort.Slice(*sms, func(i, j int) bool {
+		return (*sms)[i].Country < (*sms)[j].Country
+	})
 }

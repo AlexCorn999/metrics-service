@@ -3,8 +3,9 @@ package mms
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"sort"
 
 	"github.com/AlexCorn999/metrics-service/internal/data"
 )
@@ -16,7 +17,6 @@ type MMSData struct {
 	ResponseTime string `json:"response_time"`
 }
 
-// CheckMMSSystem получает данные о состоянии системы через GET запрос.
 func CheckMMSSystem() ([]MMSData, error) {
 	resp, err := http.Get("http://127.0.0.1:8383/mms")
 	if err != nil {
@@ -27,7 +27,7 @@ func CheckMMSSystem() ([]MMSData, error) {
 		return nil, errors.New("bad request")
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,6 @@ func CheckMMSSystem() ([]MMSData, error) {
 	return res, nil
 }
 
-// CheckCountries проверяет на корректность страны.
 func CheckCountries(mms []MMSData) ([]MMSData, error) {
 	var filteredMMS []MMSData
 	for _, value := range mms {
@@ -61,7 +60,6 @@ func CheckCountries(mms []MMSData) ([]MMSData, error) {
 	return filteredMMS, nil
 }
 
-// CheckProviders проверяет на корректность провайдера.
 func CheckProviders(mms []MMSData) ([]MMSData, error) {
 	var filteredMMS []MMSData
 	for _, value := range mms {
@@ -70,4 +68,34 @@ func CheckProviders(mms []MMSData) ([]MMSData, error) {
 		}
 	}
 	return filteredMMS, nil
+}
+
+func ResultMMSSystem(mms *[]MMSData) *[][]MMSData {
+	var resultData [][]MMSData
+
+	for i := 0; i < len(*mms); i++ {
+		country := data.Countries[(*mms)[i].Country]
+		(*mms)[i].Country = country
+	}
+
+	mms2 := make([]MMSData, len(*mms))
+	copy(mms2, *mms)
+
+	sortByProvider(mms)
+	sortByCountry(&mms2)
+
+	resultData = [][]MMSData{*mms, mms2}
+	return &resultData
+}
+
+func sortByProvider(mms *[]MMSData) {
+	sort.Slice(*mms, func(i, j int) bool {
+		return (*mms)[i].Provider < (*mms)[j].Provider
+	})
+}
+
+func sortByCountry(mms *[]MMSData) {
+	sort.Slice(*mms, func(i, j int) bool {
+		return (*mms)[i].Country < (*mms)[j].Country
+	})
 }
