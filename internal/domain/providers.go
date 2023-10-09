@@ -1,4 +1,4 @@
-package data
+package domain
 
 // ProvidersSMSMMS список провайдеров для MMS и SMM систем
 var ProvidersSMSMMS = map[string]string{
@@ -14,7 +14,7 @@ var ProvidersVoiceCall = map[string]string{
 	"JustPhone":        "yes",
 }
 
-// ProvidersEmails список провайдеров для Voice Call системы
+// ProvidersEmails список провайдеров для Email системы
 var ProvidersEmails = map[string]string{
 	"Gmail":      "yes",
 	"Yahoo":      "yes",

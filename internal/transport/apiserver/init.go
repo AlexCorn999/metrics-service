@@ -4,11 +4,17 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/AlexCorn999/metrics-service/internal/transport/mms"
+	"github.com/AlexCorn999/metrics-service/internal/transport/sms"
+	voicecall "github.com/AlexCorn999/metrics-service/internal/transport/voiceCall"
 	"github.com/gorilla/mux"
 )
 
 type APIServer struct {
-	router *mux.Router
+	router    *mux.Router
+	SMS       *sms.SMS
+	MMS       *mms.MMS
+	VoiceCall *voicecall.VoiceCall
 }
 
 func NewAPIServer() *APIServer {
@@ -21,6 +27,11 @@ func (s *APIServer) Start() error {
 	if err := s.ConfigureRouter(); err != nil {
 		return err
 	}
+
+	s.SMS = sms.NewSms("./sms.data")
+	s.MMS = mms.NewMMS()
+	s.VoiceCall = voicecall.NewVoiceCall("./voice.data")
+
 	log.Println("starting server ...")
 	return http.ListenAndServe(":8080", s.router)
 }

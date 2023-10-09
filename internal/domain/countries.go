@@ -1,4 +1,4 @@
-package data
+package domain
 
 var Countries = map[string]string{
 	"AF": "Afghanistan",

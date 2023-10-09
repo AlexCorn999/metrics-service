@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/AlexCorn999/metrics-service/internal/data"
+	"github.com/AlexCorn999/metrics-service/internal/domain"
 )
 
 type EmailData struct {
@@ -67,7 +67,7 @@ func CheckEmails(path string) ([]EmailData, error) {
 func CheckCountries(emails []EmailData) ([]EmailData, error) {
 	var filteredEmails []EmailData
 	for _, value := range emails {
-		if _, ok := data.Countries[value.Country]; ok {
+		if _, ok := domain.Countries[value.Country]; ok {
 			filteredEmails = append(filteredEmails, value)
 		}
 	}
@@ -77,7 +77,7 @@ func CheckCountries(emails []EmailData) ([]EmailData, error) {
 func CheckProviders(emails []EmailData) ([]EmailData, error) {
 	var filteredEmails []EmailData
 	for _, value := range emails {
-		if _, ok := data.ProvidersEmails[value.Provider]; ok {
+		if _, ok := domain.ProvidersEmails[value.Provider]; ok {
 			filteredEmails = append(filteredEmails, value)
 		}
 	}

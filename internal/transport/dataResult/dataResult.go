@@ -1,12 +1,10 @@
 package dataresult
 
 import (
-	"github.com/AlexCorn999/metrics-service/internal/accendent"
-	"github.com/AlexCorn999/metrics-service/internal/billing"
-	"github.com/AlexCorn999/metrics-service/internal/email"
-	"github.com/AlexCorn999/metrics-service/internal/mms"
-	"github.com/AlexCorn999/metrics-service/internal/sms"
-	voicecall "github.com/AlexCorn999/metrics-service/internal/voiceCall"
+	"github.com/AlexCorn999/metrics-service/internal/domain"
+	"github.com/AlexCorn999/metrics-service/internal/transport/accendent"
+	"github.com/AlexCorn999/metrics-service/internal/transport/billing"
+	"github.com/AlexCorn999/metrics-service/internal/transport/email"
 )
 
 type ResultT struct {
@@ -19,9 +17,9 @@ type ResultT struct {
 }
 
 type ResultSetT struct {
-	SMS       [][]sms.SMSData                `json:"sms"`
-	MMS       [][]mms.MMSData                `json:"mms"`
-	VoiceCall []voicecall.VoiceCallData      `json:"voice_call"`
+	SMS       [][]domain.SMSData             `json:"sms"`
+	MMS       [][]domain.MMSData             `json:"mms"`
+	VoiceCall []domain.VoiceCallData         `json:"voice_call"`
 	Email     map[string][][]email.EmailData `json:"email"`
 	Billing   billing.BillingData            `json:"billing"`
 	Support   []int                          `json:"support"`
@@ -32,25 +30,25 @@ func GetResultData() (*ResultSetT, error) {
 	var result ResultSetT
 
 	// SMS system
-	resultSMS, err := sms.CheckSMSSystem("./sms.data")
-	if err != nil {
-		return nil, err
-	}
-	result.SMS = *sms.ResultSMSSystem(&resultSMS)
+	//resultSMS, err := sms.CheckSMSSystem("./sms.data")
+	//if err != nil {
+	//	return nil, err
+	//}
+	//result.SMS = *sms.ResultSMSSystem(&resultSMS)
 
 	// MMS system
-	resultMMS, err := mms.CheckMMSSystem()
-	if err != nil {
-		return nil, err
-	}
-	result.MMS = *mms.ResultMMSSystem(&resultMMS)
+	//resultMMS, err := mms.CheckMMSSystem()
+	//if err != nil {
+	//	return nil, err
+	//}
+	//result.MMS = *mms.ResultMMSSystem(&resultMMS)
 
 	// VoiceCall data
-	resultVoiceCall, err := voicecall.CheckVoiceCall("./voice.data")
-	if err != nil {
-		return nil, err
-	}
-	result.VoiceCall = resultVoiceCall
+	//resultVoiceCall, err := voicecall.CheckVoiceCall("./voice.data")
+	//if err != nil {
+	//	return nil, err
+	//}
+	//result.VoiceCall = resultVoiceCall
 
 	// // Emails data
 	// resultEmail, err := email.CheckEmails("./email.data")
