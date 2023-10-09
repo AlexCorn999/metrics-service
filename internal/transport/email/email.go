@@ -3,85 +3,41 @@ package email
 import (
 	"os"
 	"sort"
-	"strconv"
-	"strings"
 
 	"github.com/AlexCorn999/metrics-service/internal/domain"
+	emailservice "github.com/AlexCorn999/metrics-service/internal/service/email"
 )
 
-type EmailData struct {
-	Country      string `json:"country"`
-	Provider     string `json:"provider"`
-	DeliveryTime int    `json:"delivery_time"`
+type EmailSystem interface {
+	ValidateEmailData(data []byte) []domain.EmailData
+	CheckCountries(emailData *[]domain.EmailData)
+	CheckProviders(emailData *[]domain.EmailData)
 }
 
-func CheckEmails(path string) ([]EmailData, error) {
-	data, err := os.ReadFile(path)
+type Email struct {
+	emailSystem EmailSystem
+	filePath    string
+}
+
+func NewEmail(filePath string) *Email {
+	return &Email{
+		filePath:    filePath,
+		emailSystem: &emailservice.EmailService{},
+	}
+}
+
+// CheckEmailSystem собирает данные из Email системы.
+func (s *Email) CheckEmailSystem() ([]domain.EmailData, error) {
+	data, err := os.ReadFile(s.filePath)
 	if err != nil {
 		return nil, err
 	}
 
-	result := strings.Split(string(data), "\n")
+	emailData := s.emailSystem.ValidateEmailData(data)
+	s.emailSystem.CheckCountries(&emailData)
+	s.emailSystem.CheckProviders(&emailData)
+	return emailData, nil
 
-	for i := 0; i < len(result); i++ {
-		str := strings.ReplaceAll(result[i], " ", "")
-		result[i] = str
-
-	}
-
-	var emailData []EmailData
-	for _, entry := range result {
-		values := strings.Split(entry, ";")
-
-		if len(values) != 3 {
-			continue
-		}
-
-		deliveryTimeInt, err := strconv.Atoi(values[2])
-		if err != nil {
-			continue
-		}
-
-		email := EmailData{
-			Country:      values[0],
-			Provider:     values[1],
-			DeliveryTime: deliveryTimeInt,
-		}
-		emailData = append(emailData, email)
-	}
-
-	newData, err := CheckCountries(emailData)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := CheckProviders(newData)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-
-}
-
-func CheckCountries(emails []EmailData) ([]EmailData, error) {
-	var filteredEmails []EmailData
-	for _, value := range emails {
-		if _, ok := domain.Countries[value.Country]; ok {
-			filteredEmails = append(filteredEmails, value)
-		}
-	}
-	return filteredEmails, nil
-}
-
-func CheckProviders(emails []EmailData) ([]EmailData, error) {
-	var filteredEmails []EmailData
-	for _, value := range emails {
-		if _, ok := domain.ProvidersEmails[value.Provider]; ok {
-			filteredEmails = append(filteredEmails, value)
-		}
-	}
-	return filteredEmails, nil
 }
 
 /*
@@ -130,7 +86,7 @@ func ResultEmailSystem(emails *[]EmailData) *map[string][][]EmailData {
 	return &resultData
 }*/
 
-func sortByCountry(email *[]EmailData) {
+func sortByCountry(email *[]domain.EmailData) {
 	sort.SliceStable(*email, func(i, j int) bool {
 		return (*email)[i].Country < (*email)[j].Country
 	})

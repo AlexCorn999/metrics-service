@@ -1,51 +1,39 @@
 package billing
 
 import (
-	"fmt"
 	"os"
-	"strconv"
-	"strings"
+
+	"github.com/AlexCorn999/metrics-service/internal/domain"
+	billingservice "github.com/AlexCorn999/metrics-service/internal/service/billing"
 )
 
-type BillingData struct {
-	CreateCustomer bool `json:"create_customer"`
-	Purchase       bool `json:"purchase"`
-	Payout         bool `json:"payout"`
-	Recurring      bool `json:"reccuring"`
-	FraudControl   bool `json:"fraud_control"`
-	CheckoutPage   bool `json:"checkout_page"`
+type BillingSystem interface {
+	ValidateBillingData(data []byte) (domain.BillingData, error)
 }
 
-func CheckBilling(path string) (*BillingData, error) {
-	data, err := os.ReadFile(path)
+type Billing struct {
+	billingSystem BillingSystem
+	filePath      string
+}
+
+func NewBilling(filePath string) *Billing {
+	return &Billing{
+		filePath:      filePath,
+		billingSystem: &billingservice.BillingService{},
+	}
+}
+
+// CheckBillingSystem собирает данные из Billing системы.
+func (s *Billing) CheckBillingSystem() (domain.BillingData, error) {
+	data, err := os.ReadFile(s.filePath)
 	if err != nil {
-		return nil, err
+		return domain.BillingData{}, err
 	}
 
-	str := strings.ReplaceAll(string(data), " ", "")
-
-	// Интерпретируем битовую маску и сохраняем сумму степеней каждого бита
-	sum := uint8(0)
-	for i := len(str) - 1; i >= 0; i-- {
-		bit, err := strconv.Atoi(string(str[i]))
-		if err != nil {
-			return nil, fmt.Errorf("ошибка преобразования:%s", err)
-		}
-
-		if bit == 1 {
-			sum += 1 << (len(str) - 1 - i)
-		}
+	billingData, err := s.billingSystem.ValidateBillingData(data)
+	if err != nil {
+		return domain.BillingData{}, err
 	}
 
-	// Проверяем каждый бит на соответствие 1 и сохраняем результаты в структуру
-	billingData := BillingData{
-		CreateCustomer: sum&1 > 0,
-		Purchase:       sum&2 > 0,
-		Payout:         sum&4 > 0,
-		Recurring:      sum&8 > 0,
-		FraudControl:   sum&16 > 0,
-		CheckoutPage:   sum&32 > 0,
-	}
-
-	return &billingData, nil
+	return billingData, nil
 }

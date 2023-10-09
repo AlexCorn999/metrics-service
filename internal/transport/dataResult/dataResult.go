@@ -2,9 +2,6 @@ package dataresult
 
 import (
 	"github.com/AlexCorn999/metrics-service/internal/domain"
-	"github.com/AlexCorn999/metrics-service/internal/transport/accendent"
-	"github.com/AlexCorn999/metrics-service/internal/transport/billing"
-	"github.com/AlexCorn999/metrics-service/internal/transport/email"
 )
 
 type ResultT struct {
@@ -17,13 +14,13 @@ type ResultT struct {
 }
 
 type ResultSetT struct {
-	SMS       [][]domain.SMSData             `json:"sms"`
-	MMS       [][]domain.MMSData             `json:"mms"`
-	VoiceCall []domain.VoiceCallData         `json:"voice_call"`
-	Email     map[string][][]email.EmailData `json:"email"`
-	Billing   billing.BillingData            `json:"billing"`
-	Support   []int                          `json:"support"`
-	Incidents []accendent.IncidentData       `json:"incident"`
+	SMS       [][]domain.SMSData              `json:"sms"`
+	MMS       [][]domain.MMSData              `json:"mms"`
+	VoiceCall []domain.VoiceCallData          `json:"voice_call"`
+	Email     map[string][][]domain.EmailData `json:"email"`
+	Billing   domain.BillingData              `json:"billing"`
+	Support   []int                           `json:"support"`
+	Incidents []domain.IncidentData           `json:"incident"`
 }
 
 func GetResultData() (*ResultSetT, error) {
@@ -58,11 +55,11 @@ func GetResultData() (*ResultSetT, error) {
 	// result.Email = *email.ResultEmailSystem(&resultEmail)
 
 	// Billing data
-	resultBilling, err := billing.CheckBilling("./billing.data")
-	if err != nil {
-		return nil, err
-	}
-	result.Billing = *resultBilling
+	//resultBilling, err := billing.CheckBilling("./billing.data")
+	//if err != nil {
+	//	return nil, err
+	//}
+	//result.Billing = *resultBilling
 
 	// // Support data
 	// resultSupport, err := support.CheckSupportData()
@@ -72,12 +69,12 @@ func GetResultData() (*ResultSetT, error) {
 	// result.Support = resultSupport
 
 	// Incidents data
-	resultIncidents, err := accendent.CheckAccendentData()
-	if err != nil {
-		return nil, err
-	}
-	accendent.ResultAccendentSystem(&resultIncidents)
-	result.Incidents = resultIncidents
+	//resultIncidents, err := accendent.CheckAccendentData()
+	//if err != nil {
+	//	return nil, err
+	//}
+	//accendent.ResultAccendentSystem(&resultIncidents)
+	//result.Incidents = resultIncidents
 
 	return &result, nil
 }

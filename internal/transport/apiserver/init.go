@@ -4,8 +4,12 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/AlexCorn999/metrics-service/internal/transport/billing"
+	"github.com/AlexCorn999/metrics-service/internal/transport/email"
+	"github.com/AlexCorn999/metrics-service/internal/transport/incidents"
 	"github.com/AlexCorn999/metrics-service/internal/transport/mms"
 	"github.com/AlexCorn999/metrics-service/internal/transport/sms"
+	"github.com/AlexCorn999/metrics-service/internal/transport/support"
 	voicecall "github.com/AlexCorn999/metrics-service/internal/transport/voiceCall"
 	"github.com/gorilla/mux"
 )
@@ -15,6 +19,10 @@ type APIServer struct {
 	SMS       *sms.SMS
 	MMS       *mms.MMS
 	VoiceCall *voicecall.VoiceCall
+	Email     *email.Email
+	Billing   *billing.Billing
+	Support   *support.Support
+	Incident  *incidents.Incident
 }
 
 func NewAPIServer() *APIServer {
@@ -31,6 +39,10 @@ func (s *APIServer) Start() error {
 	s.SMS = sms.NewSms("./sms.data")
 	s.MMS = mms.NewMMS()
 	s.VoiceCall = voicecall.NewVoiceCall("./voice.data")
+	s.Email = email.NewEmail("./email.data")
+	s.Billing = billing.NewBilling("./billing.data")
+	s.Support = support.NewSupport()
+	s.Incident = incidents.NewIncident()
 
 	log.Println("starting server ...")
 	return http.ListenAndServe(":8080", s.router)
