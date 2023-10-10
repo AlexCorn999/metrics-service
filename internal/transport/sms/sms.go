@@ -2,7 +2,6 @@ package sms
 
 import (
 	"os"
-	"sort"
 
 	"github.com/AlexCorn999/metrics-service/internal/domain"
 	smsservice "github.com/AlexCorn999/metrics-service/internal/service/sms"
@@ -12,6 +11,8 @@ type SMSSystem interface {
 	ValidateSMSData(data []byte) []domain.SMSData
 	CheckCountries(smsData *[]domain.SMSData)
 	CheckProviders(smsData *[]domain.SMSData)
+	SortByProvider(sms *[]domain.SMSData)
+	SortByCountry(sms *[]domain.SMSData)
 }
 
 type SMS struct {
@@ -40,9 +41,11 @@ func (s *SMS) CheckSMSSystem() ([]domain.SMSData, error) {
 
 }
 
-func ResultSMSSystem(sms *[]domain.SMSData) *[][]domain.SMSData {
-	var resultData [][]domain.SMSData
+// ResultSMSSystem сортирует данные и заполняет срез результатов по sms системе.
+func (s *SMS) ResultSMSSystem(sms *[]domain.SMSData) *[][]domain.SMSData {
+	var resultSMS [][]domain.SMSData
 
+	// замена кода страны на полное название
 	for i := 0; i < len(*sms); i++ {
 		country := domain.Countries[(*sms)[i].Country]
 		(*sms)[i].Country = country
@@ -51,21 +54,9 @@ func ResultSMSSystem(sms *[]domain.SMSData) *[][]domain.SMSData {
 	sms2 := make([]domain.SMSData, len(*sms))
 	copy(sms2, *sms)
 
-	sortByProvider(sms)
-	sortByCountry(&sms2)
+	s.smsSystem.SortByProvider(sms)
+	s.smsSystem.SortByCountry(&sms2)
 
-	resultData = [][]domain.SMSData{*sms, sms2}
-	return &resultData
-}
-
-func sortByProvider(sms *[]domain.SMSData) {
-	sort.Slice(*sms, func(i, j int) bool {
-		return (*sms)[i].Provider < (*sms)[j].Provider
-	})
-}
-
-func sortByCountry(sms *[]domain.SMSData) {
-	sort.Slice(*sms, func(i, j int) bool {
-		return (*sms)[i].Country < (*sms)[j].Country
-	})
+	resultSMS = [][]domain.SMSData{*sms, sms2}
+	return &resultSMS
 }

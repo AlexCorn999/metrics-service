@@ -2,6 +2,7 @@ package mmsservice
 
 import (
 	"encoding/json"
+	"sort"
 
 	"github.com/AlexCorn999/metrics-service/internal/domain"
 )
@@ -39,4 +40,18 @@ func (m *MMSService) CheckProviders(mmsData *[]domain.MMSData) {
 		}
 	}
 	*mmsData = filteredMMSData
+}
+
+// SortByProvider сортирует mms данные по полю провайдер от A до Z.
+func (m *MMSService) SortByProvider(mms *[]domain.MMSData) {
+	sort.Slice(*mms, func(i, j int) bool {
+		return (*mms)[i].Provider < (*mms)[j].Provider
+	})
+}
+
+// SortByCountry сортирует mms данные по полю страны от A до Z.
+func (m *MMSService) SortByCountry(mms *[]domain.MMSData) {
+	sort.Slice(*mms, func(i, j int) bool {
+		return (*mms)[i].Country < (*mms)[j].Country
+	})
 }

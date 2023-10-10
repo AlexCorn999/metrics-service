@@ -1,23 +1,24 @@
 package apiserver
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/AlexCorn999/metrics-service/internal/transport/billing"
 	"github.com/AlexCorn999/metrics-service/internal/transport/email"
 	"github.com/AlexCorn999/metrics-service/internal/transport/incidents"
-	"github.com/AlexCorn999/metrics-service/internal/transport/mms"
-	"github.com/AlexCorn999/metrics-service/internal/transport/sms"
+	dataresult "github.com/AlexCorn999/metrics-service/internal/transport/result"
 	"github.com/AlexCorn999/metrics-service/internal/transport/support"
 	voicecall "github.com/AlexCorn999/metrics-service/internal/transport/voiceCall"
 	"github.com/gorilla/mux"
 )
 
 type APIServer struct {
-	router    *mux.Router
-	SMS       *sms.SMS
-	MMS       *mms.MMS
+	router *mux.Router
+	Result *dataresult.Result
+	//SMS       *sms.SMS
+	//MMS       *mms.MMS
 	VoiceCall *voicecall.VoiceCall
 	Email     *email.Email
 	Billing   *billing.Billing
@@ -28,6 +29,7 @@ type APIServer struct {
 func NewAPIServer() *APIServer {
 	return &APIServer{
 		router: mux.NewRouter(),
+		Result: dataresult.NewResult(),
 	}
 }
 
@@ -36,8 +38,11 @@ func (s *APIServer) Start() error {
 		return err
 	}
 
-	s.SMS = sms.NewSms("./sms.data")
-	s.MMS = mms.NewMMS()
+	//s.SMS = sms.NewSms("./sms.data")
+	//s.MMS = mms.NewMMS()
+	res, _ := s.Result.GetResultData()
+	fmt.Printf("%+v\n", res)
+
 	s.VoiceCall = voicecall.NewVoiceCall("./voice.data")
 	s.Email = email.NewEmail("./email.data")
 	s.Billing = billing.NewBilling("./billing.data")

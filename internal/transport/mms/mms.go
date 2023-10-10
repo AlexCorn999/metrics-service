@@ -3,7 +3,6 @@ package mms
 import (
 	"io"
 	"net/http"
-	"sort"
 
 	"github.com/AlexCorn999/metrics-service/internal/domain"
 	mmsservice "github.com/AlexCorn999/metrics-service/internal/service/mms"
@@ -13,6 +12,8 @@ type MMSSystem interface {
 	ValidateMMSData(data []byte) ([]domain.MMSData, error)
 	CheckCountries(mmsData *[]domain.MMSData)
 	CheckProviders(mmsData *[]domain.MMSData)
+	SortByProvider(mms *[]domain.MMSData)
+	SortByCountry(mms *[]domain.MMSData)
 }
 
 type MMS struct {
@@ -48,12 +49,15 @@ func (m *MMS) CheckMMSSystem() ([]domain.MMSData, error) {
 
 	m.mmsSystem.CheckCountries(&mmsData)
 	m.mmsSystem.CheckProviders(&mmsData)
+
 	return mmsData, nil
 }
 
-func ResultMMSSystem(mms *[]domain.MMSData) *[][]domain.MMSData {
-	var resultData [][]domain.MMSData
+// ResultMMSSystem сортирует данные и заполняет срез результатов по mms системе.
+func (m *MMS) ResultMMSSystem(mms *[]domain.MMSData) *[][]domain.MMSData {
+	var resultMMS [][]domain.MMSData
 
+	// замена кода страны на полное название
 	for i := 0; i < len(*mms); i++ {
 		country := domain.Countries[(*mms)[i].Country]
 		(*mms)[i].Country = country
@@ -62,21 +66,9 @@ func ResultMMSSystem(mms *[]domain.MMSData) *[][]domain.MMSData {
 	mms2 := make([]domain.MMSData, len(*mms))
 	copy(mms2, *mms)
 
-	sortByProvider(mms)
-	sortByCountry(&mms2)
+	m.mmsSystem.SortByProvider(mms)
+	m.mmsSystem.SortByCountry(&mms2)
 
-	resultData = [][]domain.MMSData{*mms, mms2}
-	return &resultData
-}
-
-func sortByProvider(mms *[]domain.MMSData) {
-	sort.Slice(*mms, func(i, j int) bool {
-		return (*mms)[i].Provider < (*mms)[j].Provider
-	})
-}
-
-func sortByCountry(mms *[]domain.MMSData) {
-	sort.Slice(*mms, func(i, j int) bool {
-		return (*mms)[i].Country < (*mms)[j].Country
-	})
+	resultMMS = [][]domain.MMSData{*mms, mms2}
+	return &resultMMS
 }

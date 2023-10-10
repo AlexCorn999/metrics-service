@@ -1,6 +1,7 @@
 package smsservice
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/AlexCorn999/metrics-service/internal/domain"
@@ -60,4 +61,18 @@ func (s *SMSService) CheckProviders(smsData *[]domain.SMSData) {
 		}
 	}
 	*smsData = filteredSmsData
+}
+
+// SortByProvider сортирует sms данные по полю провайдер от A до Z.
+func (s *SMSService) SortByProvider(sms *[]domain.SMSData) {
+	sort.Slice(*sms, func(i, j int) bool {
+		return (*sms)[i].Provider < (*sms)[j].Provider
+	})
+}
+
+// SortByCountry сортирует sms данные по полю страны от A до Z.
+func (s *SMSService) SortByCountry(sms *[]domain.SMSData) {
+	sort.Slice(*sms, func(i, j int) bool {
+		return (*sms)[i].Country < (*sms)[j].Country
+	})
 }
