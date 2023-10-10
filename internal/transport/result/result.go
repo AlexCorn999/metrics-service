@@ -24,8 +24,13 @@ type Result struct {
 
 func NewResult() *Result {
 	return &Result{
-		SMS: sms.NewSms("./sms.data"),
-		MMS: mms.NewMMS(),
+		SMS:       sms.NewSms("./sms.data"),
+		MMS:       mms.NewMMS(),
+		VoiceCall: voicecall.NewVoiceCall("./voice.data"),
+		Email:     email.NewEmail("./email.data"),
+		Billing:   billing.NewBilling("./billing.data"),
+		Support:   support.NewSupport(),
+		Incident:  incidents.NewIncident(),
 	}
 }
 
@@ -35,54 +40,57 @@ func (r *Result) GetResultData() (domain.ResultSetT, error) {
 	// SMS system
 	smsSystem, err := r.SMS.CheckSMSSystem()
 	if err != nil {
-		return domain.ResultSetT{}, err
+		return domain.ResultSetT{}, domain.ErrEmptyField
 	}
+
 	resultSMS := r.SMS.ResultSMSSystem(&smsSystem)
 	result.SMS = *resultSMS
 
 	// MMS system
 	mmsSystem, err := r.MMS.CheckMMSSystem()
 	if err != nil {
-		return domain.ResultSetT{}, err
+		return domain.ResultSetT{}, domain.ErrEmptyField
 	}
 	resultMMS := r.MMS.ResultMMSSystem(&mmsSystem)
 	result.MMS = *resultMMS
 
 	// VoiceCall data
-	//resultVoiceCall, err := voicecall.CheckVoiceCall("./voice.data")
-	//if err != nil {
-	//	return nil, err
-	//}
-	//result.VoiceCall = resultVoiceCall
+	voiceCallSystem, err := r.VoiceCall.CheckVoiceCallSystem()
+	if err != nil {
+		return domain.ResultSetT{}, domain.ErrEmptyField
+	}
+	result.VoiceCall = voiceCallSystem
 
-	// // Emails data
-	// resultEmail, err := email.CheckEmails("./email.data")
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// result.Email = *email.ResultEmailSystem(&resultEmail)
+	// Emails data
+	emailSystem, err := r.Email.CheckEmailSystem()
+	if err != nil {
+		return domain.ResultSetT{}, domain.ErrEmptyField
+	}
+	resultEmail := r.Email.ResultEmailSystem(&emailSystem)
+	result.Email = *resultEmail
 
 	// Billing data
-	//resultBilling, err := billing.CheckBilling("./billing.data")
-	//if err != nil {
-	//	return nil, err
-	//}
-	//result.Billing = *resultBilling
+	billingSystem, err := r.Billing.CheckBillingSystem()
+	if err != nil {
+		return domain.ResultSetT{}, domain.ErrEmptyField
+	}
+	result.Billing = billingSystem
 
-	// // Support data
-	// resultSupport, err := support.CheckSupportData()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// result.Support = resultSupport
+	// Support data
+	supportSystem, err := r.Support.CheckSupportData()
+	if err != nil {
+		return domain.ResultSetT{}, domain.ErrEmptyField
+	}
+	resultSupport := r.Support.ResultSupportSystem(&supportSystem)
+	result.Support = *resultSupport
 
-	// Incidents data
-	//resultIncidents, err := accendent.CheckAccendentData()
-	//if err != nil {
-	//	return nil, err
-	//}
-	//accendent.ResultAccendentSystem(&resultIncidents)
-	//result.Incidents = resultIncidents
+	// Incident data
+	incidentSystem, err := r.Incident.CheckIncidentData()
+	if err != nil {
+		return domain.ResultSetT{}, domain.ErrEmptyField
+	}
+	r.Incident.ResultIncidentSystem(&incidentSystem)
+	result.Incidents = incidentSystem
 
 	return result, nil
 }

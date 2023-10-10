@@ -1,5 +1,7 @@
 package domain
 
+import "errors"
+
 type ResultT struct {
 	// true, если все этапы сбора данных прошли успешно, false во всех остальных случаях
 	Status bool `json:"status"`
@@ -8,6 +10,10 @@ type ResultT struct {
 	// пустая строка если все этапы сбора данных прошли успешно, в случае ошибки заполнено текстом ошибки (детали ниже)
 	Error string `json:"error"`
 }
+
+var (
+	ErrEmptyField = errors.New("the field of structure is empty")
+)
 
 type ResultSetT struct {
 	SMS       [][]SMSData              `json:"sms"`

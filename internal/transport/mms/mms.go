@@ -34,7 +34,7 @@ func (m *MMS) CheckMMSSystem() ([]domain.MMSData, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return []domain.MMSData{}, nil
+		return []domain.MMSData{}, domain.ErrEmptyField
 	}
 
 	data, err := io.ReadAll(resp.Body)

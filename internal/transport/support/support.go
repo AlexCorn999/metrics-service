@@ -30,7 +30,7 @@ func (s *Support) CheckSupportData() ([]domain.SupportData, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return []domain.SupportData{}, nil
+		return []domain.SupportData{}, domain.ErrEmptyField
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -44,4 +44,32 @@ func (s *Support) CheckSupportData() ([]domain.SupportData, error) {
 	}
 
 	return supportData, nil
+}
+
+// ResultSupportSystem заполняет срез результатов по support системе.
+func (s *Support) ResultSupportSystem(support *[]domain.SupportData) *[]int {
+	var resultSupport []int
+	var needTime float32
+	var ticketTime float32 = 60 / 18
+	var status int
+	var statusResult int
+
+	for _, data := range *support {
+		needTime += float32(data.ActiveTickets) * ticketTime
+		status += data.ActiveTickets
+	}
+
+	status = status / len(*support)
+
+	if status < 9 {
+		statusResult = 1
+	} else if status < 16 {
+		statusResult = 2
+	} else {
+		statusResult = 3
+	}
+
+	resultSupport = append(resultSupport, statusResult)
+	resultSupport = append(resultSupport, int(needTime))
+	return &resultSupport
 }

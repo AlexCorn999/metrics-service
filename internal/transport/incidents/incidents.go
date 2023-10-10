@@ -31,7 +31,7 @@ func (i *Incident) CheckIncidentData() ([]domain.IncidentData, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return []domain.IncidentData{}, nil
+		return []domain.IncidentData{}, domain.ErrEmptyField
 	}
 
 	data, err := io.ReadAll(resp.Body)
@@ -47,7 +47,8 @@ func (i *Incident) CheckIncidentData() ([]domain.IncidentData, error) {
 	return incidentData, nil
 }
 
-func ResultAccendentSystem(incident *[]domain.IncidentData) {
+// ResultIncidentSystem сортирует данные о системе incidents. Статусы active сверху, а close снизу.
+func (i *Incident) ResultIncidentSystem(incident *[]domain.IncidentData) {
 	sort.Slice(*incident, func(i, j int) bool {
 		return (*incident)[i].Status == "active" && (*incident)[j].Status != "active"
 	})

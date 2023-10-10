@@ -1,16 +1,13 @@
 package apiserver
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
-	"github.com/AlexCorn999/metrics-service/internal/transport/billing"
-	"github.com/AlexCorn999/metrics-service/internal/transport/email"
-	"github.com/AlexCorn999/metrics-service/internal/transport/incidents"
+	"github.com/AlexCorn999/metrics-service/internal/domain"
 	dataresult "github.com/AlexCorn999/metrics-service/internal/transport/result"
-	"github.com/AlexCorn999/metrics-service/internal/transport/support"
-	voicecall "github.com/AlexCorn999/metrics-service/internal/transport/voiceCall"
 	"github.com/gorilla/mux"
 )
 
@@ -19,11 +16,11 @@ type APIServer struct {
 	Result *dataresult.Result
 	//SMS       *sms.SMS
 	//MMS       *mms.MMS
-	VoiceCall *voicecall.VoiceCall
-	Email     *email.Email
-	Billing   *billing.Billing
-	Support   *support.Support
-	Incident  *incidents.Incident
+	//VoiceCall *voicecall.VoiceCall
+	//Email    *email.Email
+	//Billing  *billing.Billing
+	//Support  *support.Support
+	//Incident *incidents.Incident
 }
 
 func NewAPIServer() *APIServer {
@@ -40,14 +37,11 @@ func (s *APIServer) Start() error {
 
 	//s.SMS = sms.NewSms("./sms.data")
 	//s.MMS = mms.NewMMS()
-	res, _ := s.Result.GetResultData()
-	fmt.Printf("%+v\n", res)
-
-	s.VoiceCall = voicecall.NewVoiceCall("./voice.data")
-	s.Email = email.NewEmail("./email.data")
-	s.Billing = billing.NewBilling("./billing.data")
-	s.Support = support.NewSupport()
-	s.Incident = incidents.NewIncident()
+	//s.VoiceCall = voicecall.NewVoiceCall("./voice.data")
+	//s.Email = email.NewEmail("./email.data")
+	//s.Billing = billing.NewBilling("./billing.data")
+	//s.Support = support.NewSupport()
+	//s.Incident = incidents.NewIncident()
 
 	log.Println("starting server ...")
 	return http.ListenAndServe(":8080", s.router)
@@ -59,14 +53,27 @@ func (s *APIServer) ConfigureRouter() error {
 }
 
 func (s *APIServer) handleConnection(w http.ResponseWriter, r *http.Request) {
-	//var result ResultT
+	var result domain.ResultT
+	result.Status = true
 
-	//data, err := json.Marshal(result)
-	//if err != nil {
-	//	w.WriteHeader(http.StatusBadRequest)
-	//	return
-	//}
+	res, err := s.Result.GetResultData()
+	if err != nil {
+		if errors.Is(err, domain.ErrEmptyField) {
+			result.Status = false
+		} else {
+			result.Error = err.Error()
+		}
+	}
+
+	if err == nil {
+		result.Data = res
+	}
+
+	data, err := json.Marshal(result)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
-	//fmt.Println("%+v", string(data))
-	//w.Write(data)
+	w.Write(data)
 }

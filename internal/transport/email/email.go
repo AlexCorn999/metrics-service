@@ -40,54 +40,97 @@ func (s *Email) CheckEmailSystem() ([]domain.EmailData, error) {
 
 }
 
-/*
-func ResultEmailSystem(emails *[]EmailData) *map[string][][]EmailData {
-	resultData := make(map[string][][]EmailData)
-	sortByCountry(emails)
+func (s *Email) ResultEmailSystem(emails *[]domain.EmailData) *map[string][][]domain.EmailData {
+	resultEmail := make(map[string][][]domain.EmailData)
+	fastestProviders := make([]domain.EmailData, 0)
+	slowestProviders := make([]domain.EmailData, 0)
 
-	countries := make(map[string][]EmailData)
-	for _, email := range *emails {
-		countries[email.Country] = append(countries[email.Country], email)
+	sortByCountryDeliveryTimeUp(emails)
+
+	var currentCountry string
+	var currentProvider string
+	if len(*emails) > 0 {
+		currentCountry = (*emails)[0].Country
+		currentProvider = ""
+	} else {
+		return nil
 	}
 
-	for country, value := range countries {
-		fastestProviders := make([]EmailData, 3)
-		slowestProviders := make([]EmailData, 3)
+	if len(*emails) <= 1 {
+		slowestProviders = append(slowestProviders, (*emails)[0])
+		fastestProviders = append(fastestProviders, (*emails)[0])
+		resultEmail[(*emails)[0].Country] = [][]domain.EmailData{fastestProviders, slowestProviders}
+		return &resultEmail
+	}
 
-		for _, email := range value {
-			// Sort providers by delivery time in ascending order
-			sort.SliceStable(value, func(i, j int) bool {
-				return email.DeliveryTime < email.DeliveryTime
-			})
-
-			// Add fastest providers
-			if len(email) >= 3 {
-				fastestProviders = append(fastestProviders, email.Provider...)
-				fastestProviders = fastestProviders[:3]
-			} else {
-				fastestProviders = append(fastestProviders, email.Provider...)
-			}
-
-			// Add slowest providers
-			if len(email.Provider) >= 3 {
-				slowestProviders = append(slowestProviders, email.Provider...)
-				slowestProviders = slowestProviders[:3]
-			} else {
-				slowestProviders = append(slowestProviders, email.Provider...)
-			}
+	for el, email := range *emails {
+		// инициализация ключа в виде кода страны
+		if _, ok := resultEmail[email.Country]; !ok {
+			resultEmail[email.Country] = [][]domain.EmailData{}
 		}
 
+		if email.Country == currentCountry {
+			if email.Provider != currentProvider && len(fastestProviders) < 3 {
+				fastestProviders = append(fastestProviders, email)
+			}
+			currentProvider = email.Provider
+
+			if el == len(*emails)-1 {
+				resultEmail[currentCountry] = [][]domain.EmailData{fastestProviders}
+			}
+
+		} else {
+			resultEmail[currentCountry] = [][]domain.EmailData{fastestProviders}
+			fastestProviders = make([]domain.EmailData, 0)
+			currentCountry = email.Country
+			fastestProviders = append(fastestProviders, email)
+		}
 	}
 
-	fmt.Println("_____________")
-	fmt.Println(countries)
-	fmt.Println("_____________")
+	sortByCountryDeliveryTimeDown(emails)
+	currentCountry = (*emails)[0].Country
+	currentProvider = ""
 
-	return &resultData
-}*/
+	for el, email := range *emails {
 
-func sortByCountry(email *[]domain.EmailData) {
+		if email.Country == currentCountry {
+
+			if email.Provider != currentProvider && len(slowestProviders) < 3 {
+				slowestProviders = append(slowestProviders, email)
+			}
+			currentProvider = email.Provider
+
+			if el == len(*emails)-1 {
+				resultEmail[currentCountry] = append(resultEmail[currentCountry], slowestProviders)
+			}
+
+		} else {
+			resultEmail[currentCountry] = append(resultEmail[currentCountry], slowestProviders)
+			slowestProviders = make([]domain.EmailData, 0)
+			currentCountry = email.Country
+			slowestProviders = append(slowestProviders, email)
+		}
+	}
+
+	return &resultEmail
+}
+
+func sortByCountryDeliveryTimeUp(email *[]domain.EmailData) {
 	sort.SliceStable(*email, func(i, j int) bool {
-		return (*email)[i].Country < (*email)[j].Country
+		if (*email)[i].Country != (*email)[j].Country {
+			return (*email)[i].Country < (*email)[j].Country
+		} else {
+			return (*email)[i].DeliveryTime < (*email)[j].DeliveryTime
+		}
+	})
+}
+
+func sortByCountryDeliveryTimeDown(email *[]domain.EmailData) {
+	sort.SliceStable(*email, func(i, j int) bool {
+		if (*email)[i].Country != (*email)[j].Country {
+			return (*email)[i].Country < (*email)[j].Country
+		} else {
+			return (*email)[i].DeliveryTime > (*email)[j].DeliveryTime
+		}
 	})
 }
