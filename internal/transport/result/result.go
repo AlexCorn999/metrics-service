@@ -54,14 +54,14 @@ func (r *Result) GetResultData() (domain.ResultSetT, error) {
 	resultMMS := r.MMS.ResultMMSSystem(&mmsSystem)
 	result.MMS = *resultMMS
 
-	// VoiceCall data
+	// VoiceCall system
 	voiceCallSystem, err := r.VoiceCall.CheckVoiceCallSystem()
 	if err != nil {
 		return domain.ResultSetT{}, domain.ErrEmptyField
 	}
 	result.VoiceCall = voiceCallSystem
 
-	// Emails data
+	// Emails system
 	emailSystem, err := r.Email.CheckEmailSystem()
 	if err != nil {
 		return domain.ResultSetT{}, domain.ErrEmptyField
@@ -69,14 +69,14 @@ func (r *Result) GetResultData() (domain.ResultSetT, error) {
 	resultEmail := r.Email.ResultEmailSystem(&emailSystem)
 	result.Email = *resultEmail
 
-	// Billing data
+	// Billing system
 	billingSystem, err := r.Billing.CheckBillingSystem()
 	if err != nil {
 		return domain.ResultSetT{}, domain.ErrEmptyField
 	}
 	result.Billing = billingSystem
 
-	// Support data
+	// Support system
 	supportSystem, err := r.Support.CheckSupportData()
 	if err != nil {
 		return domain.ResultSetT{}, domain.ErrEmptyField
@@ -84,7 +84,7 @@ func (r *Result) GetResultData() (domain.ResultSetT, error) {
 	resultSupport := r.Support.ResultSupportSystem(&supportSystem)
 	result.Support = *resultSupport
 
-	// Incident data
+	// Incident system
 	incidentSystem, err := r.Incident.CheckIncidentData()
 	if err != nil {
 		return domain.ResultSetT{}, domain.ErrEmptyField

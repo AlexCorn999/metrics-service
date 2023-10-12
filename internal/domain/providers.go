@@ -1,20 +1,20 @@
 package domain
 
-// ProvidersSMSMMS список провайдеров для MMS и SMM систем
+// ProvidersSMSMMS список провайдеров для MMS и SMM систем.
 var ProvidersSMSMMS = map[string]string{
 	"Topolo": "yes",
 	"Rond":   "yes",
 	"Kildy":  "yes",
 }
 
-// ProvidersVoiceCall список провайдеров для Voice Call системы
+// ProvidersVoiceCall список провайдеров для Voice Call системы.
 var ProvidersVoiceCall = map[string]string{
 	"TransparentCalls": "yes",
 	"E-Voice":          "yes",
 	"JustPhone":        "yes",
 }
 
-// ProvidersEmails список провайдеров для Email системы
+// ProvidersEmails список провайдеров для Email системы.
 var ProvidersEmails = map[string]string{
 	"Gmail":      "yes",
 	"Yahoo":      "yes",

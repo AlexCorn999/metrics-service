@@ -10,7 +10,7 @@ import (
 type MMSService struct {
 }
 
-// ValidateSMSData производит проверку данных и переводит данные в структуры SMS.
+// ValidateMMSData производит проверку данных и переводит данные в структуры MMS.
 func (m *MMSService) ValidateMMSData(data []byte) ([]domain.MMSData, error) {
 	var mms []domain.MMSData
 	if err := json.Unmarshal(data, &mms); err != nil {

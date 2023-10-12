@@ -1,6 +1,7 @@
 package emailservice
 
 import (
+	"sort"
 	"strconv"
 	"strings"
 
@@ -65,4 +66,18 @@ func (s *EmailService) CheckProviders(emailData *[]domain.EmailData) {
 		}
 	}
 	*emailData = filteredEmailData
+}
+
+// SortByDeliveryTimeUp сортирует данные email по полю deliveryTime.
+func (s *EmailService) SortByDeliveryTimeUp(email *[]domain.EmailData) {
+	sort.SliceStable(*email, func(i, j int) bool {
+		return (*email)[i].DeliveryTime < (*email)[j].DeliveryTime
+	})
+}
+
+// SortByDeliveryTimeDown сортирует данные email по полю deliveryTime.
+func (s *EmailService) SortByDeliveryTimeDown(email *[]domain.EmailData) {
+	sort.SliceStable(*email, func(i, j int) bool {
+		return (*email)[i].DeliveryTime > (*email)[j].DeliveryTime
+	})
 }
