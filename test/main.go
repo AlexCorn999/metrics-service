@@ -35,12 +35,9 @@ const minEmailDeliveryTime = 0
 const maxEmailDeliveryTime = 600
 
 const smsFilename = "sms.data"
-const mmsApiUrl = "http://localhost:8282/mms"
 const voiceFilename = "voice.data"
 const emailFilename = "email.data"
 const billingFilename = "billing.data"
-const supportApiUrl = "http://localhost:8282/support"
-const accendentListFilename = "accendents.data"
 
 var firstSMSRowForCorrupt int
 var secondSMSRowForCorrupt int
