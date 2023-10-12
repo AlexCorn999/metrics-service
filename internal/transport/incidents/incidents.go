@@ -25,7 +25,7 @@ func NewIncident() *Incident {
 
 // CheckIncidentData собирает данные из Incident системы.
 func (i *Incident) CheckIncidentData() ([]domain.IncidentData, error) {
-	resp, err := http.Get("http://127.0.0.1:8383/accendent")
+	resp, err := http.Get(domain.AccendentListFilename)
 	if err != nil {
 		return nil, err
 	}

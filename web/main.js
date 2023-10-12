@@ -1,6 +1,5 @@
 (function () {
-    let apiPath = 'http://localhost:8080';
-    //let apiPath = 'response/error.json';
+    let apiPath = 'http://localhost:8080/test';
 
     let dataScheme = {
         'voice_call': [

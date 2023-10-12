@@ -37,8 +37,8 @@ func (s *SMS) CheckSMSSystem() ([]domain.SMSData, error) {
 	smsData := s.smsSystem.ValidateSMSData(data)
 	s.smsSystem.CheckCountries(&smsData)
 	s.smsSystem.CheckProviders(&smsData)
-	return smsData, nil
 
+	return smsData, nil
 }
 
 // ResultSMSSystem сортирует данные и заполняет срез результатов по sms системе.

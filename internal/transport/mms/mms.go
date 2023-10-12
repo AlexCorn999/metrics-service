@@ -28,7 +28,7 @@ func NewMMS() *MMS {
 
 // CheckMMSSystem собирает данные из MMS системы.
 func (m *MMS) CheckMMSSystem() ([]domain.MMSData, error) {
-	resp, err := http.Get("http://127.0.0.1:8383/mms")
+	resp, err := http.Get(domain.MMSApiUrl)
 	if err != nil {
 		return nil, err
 	}

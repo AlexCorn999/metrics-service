@@ -14,13 +14,6 @@ import (
 type APIServer struct {
 	router *mux.Router
 	Result *dataresult.Result
-	//SMS       *sms.SMS
-	//MMS       *mms.MMS
-	//VoiceCall *voicecall.VoiceCall
-	//Email    *email.Email
-	//Billing  *billing.Billing
-	//Support  *support.Support
-	//Incident *incidents.Incident
 }
 
 func NewAPIServer() *APIServer {
@@ -35,20 +28,12 @@ func (s *APIServer) Start() error {
 		return err
 	}
 
-	//s.SMS = sms.NewSms("./sms.data")
-	//s.MMS = mms.NewMMS()
-	//s.VoiceCall = voicecall.NewVoiceCall("./voice.data")
-	//s.Email = email.NewEmail("./email.data")
-	//s.Billing = billing.NewBilling("./billing.data")
-	//s.Support = support.NewSupport()
-	//s.Incident = incidents.NewIncident()
-
 	log.Println("starting server ...")
 	return http.ListenAndServe(":8080", s.router)
 }
 
 func (s *APIServer) ConfigureRouter() error {
-	s.router.HandleFunc("/", s.handleConnection)
+	s.router.HandleFunc("/test", s.handleConnection).Methods("GET", "OPTIONS")
 	return nil
 }
 

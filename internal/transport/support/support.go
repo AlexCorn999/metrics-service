@@ -24,7 +24,7 @@ func NewSupport() *Support {
 
 // CheckSupportData собирает данные из Support системы.
 func (s *Support) CheckSupportData() ([]domain.SupportData, error) {
-	resp, err := http.Get("http://127.0.0.1:8383/support")
+	resp, err := http.Get(domain.SupportApiUrl)
 	if err != nil {
 		return nil, err
 	}

@@ -24,11 +24,11 @@ type Result struct {
 
 func NewResult() *Result {
 	return &Result{
-		SMS:       sms.NewSms("./sms.data"),
+		SMS:       sms.NewSms(domain.SMSFilename),
 		MMS:       mms.NewMMS(),
-		VoiceCall: voicecall.NewVoiceCall("./voice.data"),
-		Email:     email.NewEmail("./email.data"),
-		Billing:   billing.NewBilling("./billing.data"),
+		VoiceCall: voicecall.NewVoiceCall(domain.VoiceFilename),
+		Email:     email.NewEmail(domain.EmailFilename),
+		Billing:   billing.NewBilling(domain.BillingFilename),
 		Support:   support.NewSupport(),
 		Incident:  incidents.NewIncident(),
 	}
