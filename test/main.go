@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
@@ -144,7 +143,7 @@ func shuffleSmsData() {
 		data += row
 	}
 
-	err := ioutil.WriteFile(getFilapathByFilename(smsFilename), []byte(data), 0644)
+	err := os.WriteFile(getFilapathByFilename(smsFilename), []byte(data), 0644)
 	if err != nil {
 		fmt.Printf("Error in write sms data: %s", err.Error())
 	}
